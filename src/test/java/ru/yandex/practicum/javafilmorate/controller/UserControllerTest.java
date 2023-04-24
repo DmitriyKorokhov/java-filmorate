@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.javafilmorate.controller;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.javafilmorate.model.User;
 
 import javax.validation.*;
 import java.time.LocalDate;

@@ -1,7 +1,7 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.javafilmorate.model;
 
 import lombok.Data;
-import ru.yandex.practicum.filmorate.validation.FilmReleaseDate;
+import ru.yandex.practicum.javafilmorate.validation.FilmReleaseDate;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
