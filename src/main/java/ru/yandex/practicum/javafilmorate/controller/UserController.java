@@ -8,7 +8,6 @@ import ru.yandex.practicum.javafilmorate.model.User;
 import javax.validation.Valid;
 import java.util.*;
 
-
 @RestController
 @RequestMapping("/users")
 @Slf4j
@@ -18,6 +17,7 @@ public class UserController {
 
     @GetMapping
     public List<User> getUsers() {
+        log.info("Вывод всех Users");
         return new ArrayList<>(users.values());
     }
 
@@ -28,7 +28,6 @@ public class UserController {
         users.put(userId, user);
         userId++;
         log.info("User добавлен", user);
-
         return user;
     }
 

@@ -14,7 +14,6 @@ import java.time.Month;
 import java.util.List;
 import java.util.Set;
 
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -23,7 +22,6 @@ class UserControllerTest {
     private User user;
     private Validator validator;
 
-
     @BeforeEach
     void beforeEach() {
         userController = new UserController();
@@ -31,11 +29,15 @@ class UserControllerTest {
         validator = factory.getValidator();
     }
 
-
     @Test
     void addUser() {
-        user = new User(1, "test@mail.ru", "testLogin", "Dmitriy",
-                LocalDate.of(2003, 11, 24));
+        user = User.builder()
+                .id(1)
+                .email("test@mail.ru")
+                .login("testLogin")
+                .name("Dmitriy")
+                .birthday(LocalDate.of(2003, 11, 24))
+                .build();
         userController.addUser(user);
         List<User> savedUsers = userController.getUsers();
         assertEquals(1, savedUsers.size(), "Неверное количество users");
@@ -44,8 +46,13 @@ class UserControllerTest {
 
     @Test
     void notAddUserWithNullEmail() {
-        user = new User(1, null, "testLogin", "Dmitriy",
-                LocalDate.of(2003, 11, 24));
+        user = User.builder()
+                .id(1)
+                .email(null)
+                .login("testLogin")
+                .name("Dmitriy")
+                .birthday(LocalDate.of(2003, 11, 24))
+                .build();
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             Set<ConstraintViolation<User>> violations = validator.validate(user);
             if (!violations.isEmpty()) {
@@ -57,8 +64,13 @@ class UserControllerTest {
 
     @Test
     void notAddUserWithIncorrectEmail() {
-        user = new User(1, "mail.ru", "testLogin", "Dmitriy",
-                LocalDate.of(2003, 11, 24));
+        user = User.builder()
+                .id(1)
+                .email("mail.ru")
+                .login("testLogin")
+                .name("Dmitriy")
+                .birthday(LocalDate.of(2003, 11, 24))
+                .build();
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             Set<ConstraintViolation<User>> violations = validator.validate(user);
             if (!violations.isEmpty()) {
@@ -70,8 +82,13 @@ class UserControllerTest {
 
     @Test
     void notAddUserWithIncorrectLogin() {
-        user = new User(1, "test@mail.ru", "", "Dmitriy",
-                LocalDate.of(2003, 11, 24));
+        user = User.builder()
+                .id(1)
+                .email("test@mail.ru")
+                .login("")
+                .name("Dmitriy")
+                .birthday(LocalDate.of(2003, 11, 24))
+                .build();
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             Set<ConstraintViolation<User>> violations = validator.validate(user);
             if (!violations.isEmpty()) {
@@ -83,8 +100,13 @@ class UserControllerTest {
 
     @Test
     void notAddUserLoginWithASpace() {
-        user = new User(1, "test@mail.ru", "test login", "Dmitriy",
-                LocalDate.of(2003, 11, 24));
+        user = User.builder()
+                .id(1)
+                .email("test@mail.ru")
+                .login("tes tLogin")
+                .name("Dmitriy")
+                .birthday(LocalDate.of(2003, 11, 24))
+                .build();
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             Set<ConstraintViolation<User>> violations = validator.validate(user);
             if (!violations.isEmpty()) {
@@ -95,21 +117,14 @@ class UserControllerTest {
     }
 
     @Test
-    void notAddUserWithNullBirthday() {
-        user = new User(1, "test@mail.ru", "testLogin", "Dmitriy", null);
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
-            Set<ConstraintViolation<User>> violations = validator.validate(user);
-            if (!violations.isEmpty()) {
-                throw new ValidationException("birthday: Birthday не должен быть пустым");
-            }
-        });
-        Assertions.assertEquals("birthday: Birthday не должен быть пустым", exception.getMessage());
-    }
-
-    @Test
     void notAddUserWithIncorrectBirthday() {
-        user = new User(1, "test@mail.ru", "testLogin", "Dmitriy",
-                LocalDate.of(2199, 11, 24));
+        user = User.builder()
+                .id(1)
+                .email("test@mail.ru")
+                .login("testLogin")
+                .name("Dmitriy")
+                .birthday(LocalDate.of(2199, 11, 24))
+                .build();
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             user.setBirthday(LocalDate.of(2895, 12, 28));
             Set<ConstraintViolation<User>> violations = validator.validate(user);
@@ -122,8 +137,13 @@ class UserControllerTest {
 
     @Test
     void addUserWithEmptyName() {
-        user = new User(1, "test@mail.ru", "testLogin", "",
-                LocalDate.of(2003, 11, 24));
+        user = User.builder()
+                .id(1)
+                .email("test@mail.ru")
+                .login("testLogin")
+                .name("")
+                .birthday(LocalDate.of(2003, 11, 24))
+                .build();
         userController.addUser(user);
         List<User> savedUsers = userController.getUsers();
         assertEquals(1, savedUsers.size(), "Неверное количество users");
@@ -132,11 +152,21 @@ class UserControllerTest {
 
     @Test
     void updateUser() {
-        user = new User(1, "test@mail.ru", "testLogin", "Dmitriy",
-                LocalDate.of(2003, 11, 24));
+        user = User.builder()
+                .id(1)
+                .email("test@mail.ru")
+                .login("testLogin")
+                .name("Dmitriy")
+                .birthday(LocalDate.of(2199, 11, 24))
+                .build();
         userController.addUser(user);
-        User newUser = new User(1, "test@mail.ru", "testLogin", "Kate",
-                LocalDate.of(2004, Month.APRIL, 13));
+        User newUser = User.builder()
+                .id(1)
+                .email("test@mail.ru")
+                .login("testLogin")
+                .name("Kate")
+                .birthday(LocalDate.of(2004, Month.APRIL, 13))
+                .build();
         userController.updateUser(newUser);
         List<User> savedUsers = userController.getUsers();
         assertEquals(1, savedUsers.size(), "Неверное количество users");

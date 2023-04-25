@@ -18,6 +18,7 @@ public class FilmController {
 
     @GetMapping
     public List<Film> getFilm() {
+        log.info("Вывод всех Films");
         return new ArrayList<>(films.values());
     }
 

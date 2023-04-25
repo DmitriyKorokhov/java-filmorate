@@ -12,7 +12,7 @@
 	<artifactId>java-filmorate</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>filmorate</name>
-	<description>Spring Boot</description>
+	<description>Filmorate application built on the basis of Sprint Boot</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
