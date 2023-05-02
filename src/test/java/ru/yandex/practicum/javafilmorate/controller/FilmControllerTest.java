@@ -5,6 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.javafilmorate.model.Film;
+import ru.yandex.practicum.javafilmorate.service.FilmService;
+import ru.yandex.practicum.javafilmorate.storage.InMemoryFilmStorage;
+
 
 import javax.validation.*;
 
@@ -21,39 +24,30 @@ class FilmControllerTest {
     private Film film;
     private Validator validator;
 
+
     @BeforeEach
     void beforeEach() {
-        filmController = new FilmController();
+        filmController = new FilmController(new FilmService(new InMemoryFilmStorage()));
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
 
     @Test
     void addFilm() {
-        film = Film.builder()
-                .id(1)
-                .name("The Batman")
-                .description("Batman will have to distinguish friend from foe " +
-                        "and restore justice in the name of Gotham.")
-                .releaseDate(LocalDate.of(2022, Month.MARCH, 1))
-                .duration(2)
-                .build();
+        film = new Film(1, "The Batman", "Batman will have to distinguish friend from foe " +
+                "and restore justice in the name of Gotham.",
+                LocalDate.of(2022, Month.MARCH, 1), 2);
         filmController.addFilm(film);
-        List<Film> savedFilms = filmController.getFilm();
+        List<Film> savedFilms = filmController.getAllFilms();
         assertEquals(1, savedFilms.size(), "Неверное количество films");
         assertEquals(film, savedFilms.get(0), "Film добавлен некорректно");
     }
 
     @Test
     void notAddFilmWithEmptyName() {
-        film = Film.builder()
-                .id(1)
-                .name("")
-                .description("Batman will have to distinguish friend from foe " +
-                        "and restore justice in the name of Gotham.")
-                .releaseDate(LocalDate.of(2022, Month.MARCH, 1))
-                .duration(2)
-                .build();
+        film = new Film(1, "", "Batman will have to distinguish friend from foe " +
+                "and restore justice in the name of Gotham.",
+                LocalDate.of(2022, Month.MARCH, 1), 2);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             Set<ConstraintViolation<Film>> violations = validator.validate(film);
             if (!violations.isEmpty()) {
@@ -65,18 +59,13 @@ class FilmControllerTest {
 
     @Test
     void notAddFilmWithDescriptionLongerThan200symbols() {
-        film = Film.builder()
-                .id(1)
-                .name("The Batman")
-                .description("When a series of violent attacks on " +
-                        "high-ranking officials takes place in the city, " +
-                        "evidence leads Bruce Wayne into the darkest corners of the underworld, " +
-                        "where he meets Catwoman, Penguin, Carmine Falcone and the Riddler. " +
-                        "Now Batman himself is under the gun, who will have to distinguish friend from enemy and " +
-                        "restore justice in the name of Gotham.")
-                .releaseDate(LocalDate.of(2022, Month.MARCH, 1))
-                .duration(2)
-                .build();
+        film = new Film(1, "The Batman", "When a series of violent attacks on " +
+                "high-ranking officials takes place in the city, " +
+                "evidence leads Bruce Wayne into the darkest corners of the underworld, " +
+                "where he meets Catwoman, Penguin, Carmine Falcone and the Riddler. " +
+                "Now Batman himself is under the gun, who will have to distinguish friend from enemy and " +
+                "restore justice in the name of Gotham.",
+                LocalDate.of(2022, Month.MARCH, 1), 2);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             Set<ConstraintViolation<Film>> violations = validator.validate(film);
             if (!violations.isEmpty()) {
@@ -88,31 +77,34 @@ class FilmControllerTest {
     }
 
     @Test
+    void notAddFilmWithNullReleaseDate() {
+        film = new Film(1, "The Batman", "Batman will have to distinguish friend from foe " +
+                "and restore justice in the name of Gotham.", null, 2);
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
+            Set<ConstraintViolation<Film>> violations = validator.validate(film);
+            if (!violations.isEmpty()) {
+                throw new ValidationException("releaseDate: ReleaseDate фильма не может быть пустым");
+            }
+        });
+        Assertions.assertEquals("releaseDate: ReleaseDate фильма не может быть пустым", exception.getMessage());
+    }
+
+    @Test
     void notAddFilmWithReleaseDateIn20December1895() {
-        film = Film.builder()
-                .id(1)
-                .name("Sea")
-                .description("The film shows the beach shore with a pier. " +
-                        "Vacationers jump from the pier into shallow water and come out of the water to the shore.")
-                .releaseDate(LocalDate.of(1895, Month.DECEMBER, 20))
-                .duration(1)
-                .build();
+        film = new Film(1, "Sea", "The film shows the beach shore with a pier. " +
+                "Vacationers jump from the pier into shallow water and come out of the water to the shore.",
+                LocalDate.of(1895, Month.DECEMBER, 20), 1);
         filmController.addFilm(film);
-        List<Film> savedFilms = filmController.getFilm();
+        List<Film> savedFilms = filmController.getAllFilms();
         assertEquals(1, savedFilms.size(), "Неверное количество films");
         assertEquals(film, savedFilms.get(0), "Film добавлен некорректно");
     }
 
     @Test
     void notAddFilmWithReleaseDateEarlierThan20December1895() {
-        film = Film.builder()
-                .id(1)
-                .name("Blacksmiths")
-                .description("The film shows the work of a pair of blacksmiths — " +
-                        "one strikes the workpiece with a hammer, and the other rotates the handle of a hand pump.")
-                .releaseDate(LocalDate.of(1890, 12, 28))
-                .duration(1)
-                .build();
+        film = new Film(1, "Blacksmiths", "The film shows the work of a pair of blacksmiths — " +
+                "one strikes the workpiece with a hammer, and the other rotates the handle of a hand pump.",
+                LocalDate.of(1890, 12, 28), 1);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             Set<ConstraintViolation<Film>> violations = validator.validate(film);
             if (!violations.isEmpty()) {
@@ -124,14 +116,9 @@ class FilmControllerTest {
 
     @Test
     void notAddFilmNegativeDuration() {
-        film = Film.builder()
-                .id(1)
-                .name("The Batman")
-                .description("Batman will have to distinguish friend from foe " +
-                        "and restore justice in the name of Gotham.")
-                .releaseDate(LocalDate.of(2022, Month.MARCH, 1))
-                .duration(-2)
-                .build();
+        film = new Film(1, "The Batman", "Batman will have to distinguish friend from foe " +
+                "and restore justice in the name of Gotham.",
+                LocalDate.of(2022, Month.MARCH, 1), -2);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             Set<ConstraintViolation<Film>> violations = validator.validate(film);
             if (!violations.isEmpty()) {
@@ -143,26 +130,16 @@ class FilmControllerTest {
 
     @Test
     void updateFilm() {
-        film = Film.builder()
-                .id(1)
-                .name("The Batman")
-                .description("Batman will have to distinguish friend from foe " +
-                        "and restore justice in the name of Gotham.")
-                .releaseDate(LocalDate.of(2022, Month.MARCH, 1))
-                .duration(2)
-                .build();
+        film = new Film(1, "The Batman", "Batman will have to distinguish friend from foe " +
+                "and restore justice in the name of Gotham.",
+                LocalDate.of(2022, Month.MARCH, 1), 2);
         filmController.addFilm(film);
-        Film newFilm = Film.builder()
-                .id(1)
-                .name("Spider-Man")
-                .description("Peter becomes a real superhero named Spider-Man, " +
-                        "who helps people and fights crime. But where there is a superhero, " +
-                        "sooner or later a supervillain always appears.")
-                .releaseDate(LocalDate.of(2002, Month.APRIL, 30))
-                .duration(2)
-                .build();
-        filmController.updated(newFilm);
-        List<Film> savedFilms = filmController.getFilm();
+        Film newFilm = new Film(1, "Spider-Man", "Peter becomes a real superhero named Spider-Man, " +
+                "who helps people and fights crime. But where there is a superhero, " +
+                "sooner or later a supervillain always appears.",
+                LocalDate.of(2002, Month.APRIL, 30), 2);
+        filmController.updateFilm(newFilm);
+        List<Film> savedFilms = filmController.getAllFilms();
         assertEquals(1, savedFilms.size(), "Неверное количество films");
         assertEquals(newFilm, savedFilms.get(0), "Film добавлен некорректно");
     }
