@@ -39,8 +39,7 @@ public class UserService {
         User user = getUserById(id);
         User newFried = getUserById(friendId);
         if (user.getFriends().contains(friendId)) {
-            throw new ValidationException("Friend с id = " + friendId
-                    + " уже является другом User c id = " + id);
+            throw new ValidationException("Friend с id = " + friendId + " уже является другом User c id = " + id);
         } else {
             user.getFriends().add(friendId);
             newFried.getFriends().add(id);
