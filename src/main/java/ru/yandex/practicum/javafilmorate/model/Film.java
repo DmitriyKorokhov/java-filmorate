@@ -1,5 +1,6 @@
 package ru.yandex.practicum.javafilmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.javafilmorate.validation.FilmReleaseDate;
 
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@Builder
 public class Film {
     private int id;
     @NotBlank(message = "Name фильма не может быть пустым")
@@ -21,12 +23,10 @@ public class Film {
     private Integer duration;
     private Set<Integer> likes;
 
-    public Film(int id, String name, String description, LocalDate releaseDate, Integer duration) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.likes = likes == null ? new HashSet<>() : likes;
+    public Set<Integer> getLikes() {
+        if (likes == null) {
+            likes = new HashSet<>();
+        }
+        return likes;
     }
 }
