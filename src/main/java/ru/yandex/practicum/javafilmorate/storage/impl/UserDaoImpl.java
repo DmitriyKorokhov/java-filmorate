@@ -67,10 +67,12 @@ public class UserDaoImpl implements UserDao {
     }
 
     public User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
-        return new User(rs.getInt("id"),
-                rs.getString("name"),
-                rs.getString("login"),
-                rs.getString("email"),
-                rs.getDate("birthday").toLocalDate());
+        return User.builder()
+                .id(rs.getInt("id"))
+                .email(rs.getString("email"))
+                .login(rs.getString("name"))
+                .name(rs.getString("login"))
+                .birthday(rs.getDate("birthday").toLocalDate())
+                .build();
     }
 }

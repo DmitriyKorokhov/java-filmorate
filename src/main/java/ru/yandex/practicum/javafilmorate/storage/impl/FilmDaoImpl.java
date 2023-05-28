@@ -87,12 +87,14 @@ public class FilmDaoImpl implements FilmDao {
     }
 
     private Film mapRowToFilm(ResultSet rs, int rowNum) throws SQLException {
-        return new Film(rs.getInt("id"),
-                rs.getString("name"),
-                rs.getString("description"),
-                rs.getDate("release_date").toLocalDate(),
-                rs.getInt("duration"),
-                new Mpa(rs.getInt("rating_id"), rs.getString("mpa_name")),
-                new LinkedHashSet<>());
+        return Film.builder()
+                .id(rs.getInt("id"))
+                .name(rs.getString("name"))
+                .description(rs.getString("description"))
+                .releaseDate(rs.getDate("release_date").toLocalDate())
+                .duration(rs.getInt("duration"))
+                .mpa(Mpa.builder().id(rs.getInt("rating_id")).name(rs.getString("mpa_name")).build())
+                .genres(new LinkedHashSet<>())
+                .build();
     }
 }
