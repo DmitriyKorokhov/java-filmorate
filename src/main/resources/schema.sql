@@ -44,7 +44,6 @@ create TABLE IF NOT EXISTS users(
     CONSTRAINT user_const CHECK (login <> '' AND email <> '' ),
     CONSTRAINT exist_user_email UNIQUE (email),
     CONSTRAINT exist_user_login UNIQUE (login)
-
     );
 
 create TABLE IF NOT EXISTS friendship(
