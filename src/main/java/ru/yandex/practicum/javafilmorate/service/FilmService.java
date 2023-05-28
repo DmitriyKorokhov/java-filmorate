@@ -1,52 +1,63 @@
 package ru.yandex.practicum.javafilmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.javafilmorate.storage.GenreDao;
+import ru.yandex.practicum.javafilmorate.storage.LikesDao;
+import ru.yandex.practicum.javafilmorate.storage.MpaDao;
 import ru.yandex.practicum.javafilmorate.exception.*;
 import ru.yandex.practicum.javafilmorate.model.Film;
-import ru.yandex.practicum.javafilmorate.storage.FilmStorage;
+import ru.yandex.practicum.javafilmorate.storage.FilmDao;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class FilmService {
-    private final FilmStorage filmStorage;
 
-    @Autowired
-    public FilmService(FilmStorage filmStorage) {
-        this.filmStorage = filmStorage;
-    }
+    private final FilmDao filmDao;
+    private final MpaDao daoStorage;
+    private final GenreDao genreDao;
+    private final LikesDao likesDao;
 
     public List<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+        List<Film> films = filmDao.getAllFilms();
+        films = genreDao.loadGenres(films);
+        log.info("Вывод списка всех Films");
+        return films;
     }
 
     public Film addFilm(Film film) {
-        return filmStorage.addFilm(film);
+        daoStorage.isMpaExistedById(film.getMpa().getId());
+        filmDao.addFilm(film);
+        genreDao.addFilmGenre(film);
+        log.info("Добавление нового фильма с id = %d", film.getId());
+        return film;
     }
 
     public Film updateFilm(Film film) {
-        return filmStorage.updateFilm(film);
+        checkFilmExist(film.getId());
+        genreDao.updateFilmGenre(film);
+        daoStorage.isMpaExistedById(film.getMpa().getId());
+        filmDao.updateFilm(film);
+        log.info("Film c id = %d обнавлен", film.getId());
+        return film;
     }
 
     public Film getFilmById(int id) {
-        return filmStorage.getFilmById(id);
+        checkFilmExist(id);
+        Film film = filmDao.getFilmById(id);
+        log.info("Вывод Film с id = %d", id);
+        return genreDao.loadGenres(List.of(film)).get(0);
     }
 
-    public Film likesFilm(int filmId, int userId) {
-        Film film = getFilmById(filmId);
-        if (film.getLikes().contains(userId)) {
-            throw new ObjectAlreadyAddException("Лайк User с id = " + userId +
-                    " к фильму с id = " + filmId + " уже добавлен");
-        } else {
-            film.getLikes().add(userId);
-            log.info("Лайк User с id = ", userId, " к фильму с id = ", filmId, " добавлен");
-            updateFilm(film);
-            return film;
-        }
+    public void likesFilm(int filmId, int userId) {
+
+        checkFilmExist(userId);
+        likesDao.addLike(filmId, userId);
+        log.info("Лайк User с id = ", userId, " к фильму с id = ", filmId, " добавлен");
     }
 
     public Film deleteLikeOfTheFilm(int filmId, int userId) {
@@ -54,22 +65,19 @@ public class FilmService {
             throw new NotFoundException("Идентификаторы User или Film не могут быть отрицательными");
         } else {
             Film film = getFilmById(filmId);
-            film.getLikes().remove(userId);
+            likesDao.deleteLike(filmId, userId);
             log.info("Лайк User с id = ", userId, " к фильму с id = ", filmId, " удален");
-            updateFilm(film);
             return film;
         }
     }
 
     public List<Film> listOfFilmsByNumberOfLikes(Integer count) {
-        if (count == null || count < 1) {
-            count = 10;
+        return filmDao.listOfFilmsByNumberOfLikes(count);
+    }
+
+    public void checkFilmExist(int id) {
+        if (!filmDao.isFilmExistedById(id)) {
+            throw new NotFoundException(String.format("Film с id = %d не сужествует", id));
         }
-        List<Film> filmSort = filmStorage.getAllFilms();
-        if (filmSort.size() < count) {
-            count = filmSort.size();
-        }
-        filmSort.sort(Comparator.comparingInt(f -> -1 * f.getLikes().size()));
-        return filmSort.subList(0, count);
     }
 }

@@ -4,7 +4,7 @@ import ru.yandex.practicum.javafilmorate.model.User;
 
 import java.util.List;
 
-public interface UserStorage {
+public interface UserDao {
     List<User> getAllUsers();
 
     User addUser(User user);
@@ -12,4 +12,6 @@ public interface UserStorage {
     User updateUser(User user);
 
     User getUserById(int id);
+
+    boolean isUserExistedById(int id);
 }
