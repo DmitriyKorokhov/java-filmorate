@@ -18,6 +18,7 @@ import java.util.List;
 public class GenreController {
 
     private final GenreService filmService;
+
     @GetMapping
     public List<Genre> getAllGenres() {
         return filmService.getAllGenres();
