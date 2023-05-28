@@ -138,7 +138,7 @@ class FilmorateApplicationTest {
                         .releaseDate(LocalDate.of(2022, Month.MARCH, 1))
                         .duration(2)
                         .mpa(Mpa.builder().id(1).name("R").build())
-                        .genres( new LinkedHashSet<>())
+                        .genres(new LinkedHashSet<>())
                 .build());
         Optional<Film> filmOptional = Optional.of(filmDao.getFilmById(1));
         assertThat(filmOptional)
@@ -166,7 +166,7 @@ class FilmorateApplicationTest {
                 .releaseDate(LocalDate.of(2022, Month.MARCH, 1))
                 .duration(2)
                 .mpa(Mpa.builder().id(1).name("R").build())
-                .genres( new LinkedHashSet<>())
+                .genres(new LinkedHashSet<>())
                 .build());
         Film newfilm = filmDao.getFilmById(1);
         newfilm.setName("UpdatedFilm");
@@ -195,7 +195,7 @@ class FilmorateApplicationTest {
                 .releaseDate(LocalDate.of(2022, Month.MARCH, 1))
                 .duration(2)
                 .mpa(Mpa.builder().id(1).name("R").build())
-                .genres( new LinkedHashSet<>())
+                .genres(new LinkedHashSet<>())
                 .build());
         filmDao.addFilm(Film.builder()
                 .id(2)
@@ -206,7 +206,7 @@ class FilmorateApplicationTest {
                 .releaseDate(LocalDate.of(2002, Month.MARCH, 11))
                 .duration(2)
                 .mpa(Mpa.builder().id(1).name("R").build())
-                .genres( new LinkedHashSet<>())
+                .genres(new LinkedHashSet<>())
                 .build());
         List<Film> films = filmDao.getAllFilms();
         assertThat(films).size()
@@ -224,7 +224,7 @@ class FilmorateApplicationTest {
                 .releaseDate(LocalDate.of(2002, Month.MARCH, 11))
                 .duration(2)
                 .mpa(Mpa.builder().id(1).name("R").build())
-                .genres( new LinkedHashSet<>())
+                .genres(new LinkedHashSet<>())
                 .build());
         userDao.addUser(User.builder()
                 .id(1)
