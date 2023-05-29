@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.javafilmorate.storage.GenreDao;
-import ru.yandex.practicum.javafilmorate.storage.LikesDao;
 import ru.yandex.practicum.javafilmorate.storage.MpaDao;
 import ru.yandex.practicum.javafilmorate.exception.*;
 import ru.yandex.practicum.javafilmorate.model.Film;
@@ -18,9 +17,8 @@ import java.util.List;
 public class FilmService {
 
     private final FilmDao filmDao;
-    private final MpaDao daoStorage;
+    private final MpaDao mpaDao;
     private final GenreDao genreDao;
-    private final LikesDao likesDao;
 
     public List<Film> getAllFilms() {
         List<Film> films = filmDao.getAllFilms();
@@ -30,45 +28,38 @@ public class FilmService {
     }
 
     public Film addFilm(Film film) {
-        daoStorage.isMpaExistedById(film.getMpa().getId());
+        mpaDao.isMpaExistedById(film.getMpa().getId());
         filmDao.addFilm(film);
         genreDao.addFilmGenre(film);
-        log.info("Добавление нового фильма с id = %d", film.getId());
+        log.info("Добавление нового фильма с id = " + film.getId());
         return film;
+    }
+
+    public void deleteAllFilms() {
+        log.info("Все Films удалены");
+        filmDao.deleteAllFilms();
+    }
+
+    public Film deleteFilmById(int id) {
+        checkFilmExist(id);
+        log.info("Film с id = " + id + " удален");
+        return filmDao.deleteFilmById(id);
     }
 
     public Film updateFilm(Film film) {
         checkFilmExist(film.getId());
         genreDao.updateFilmGenre(film);
-        daoStorage.isMpaExistedById(film.getMpa().getId());
+        mpaDao.isMpaExistedById(film.getMpa().getId());
         filmDao.updateFilm(film);
-        log.info("Film c id = %d обнавлен", film.getId());
+        log.info("Film c id = " + film.getId() + " обнавлен");
         return film;
     }
 
     public Film getFilmById(int id) {
         checkFilmExist(id);
         Film film = filmDao.getFilmById(id);
-        log.info("Вывод Film с id = %d", id);
+        log.info("Вывод Film с id = " + id);
         return genreDao.loadGenres(List.of(film)).get(0);
-    }
-
-    public void likesFilm(int filmId, int userId) {
-
-        checkFilmExist(userId);
-        likesDao.addLike(filmId, userId);
-        log.info("Лайк User с id = ", userId, " к фильму с id = ", filmId, " добавлен");
-    }
-
-    public Film deleteLikeOfTheFilm(int filmId, int userId) {
-        if (filmId < 0 || userId < 0) {
-            throw new NotFoundException("Идентификаторы User или Film не могут быть отрицательными");
-        } else {
-            Film film = getFilmById(filmId);
-            likesDao.deleteLike(filmId, userId);
-            log.info("Лайк User с id = ", userId, " к фильму с id = ", filmId, " удален");
-            return film;
-        }
     }
 
     public List<Film> listOfFilmsByNumberOfLikes(Integer count) {
@@ -77,7 +68,7 @@ public class FilmService {
 
     public void checkFilmExist(int id) {
         if (!filmDao.isFilmExistedById(id)) {
-            throw new NotFoundException(String.format("Film с id = %d не сужествует", id));
+            throw new NotFoundException(String.format("Не существует Film с id = " + id));
         }
     }
 }

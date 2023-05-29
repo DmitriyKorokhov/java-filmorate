@@ -37,6 +37,20 @@ public class FilmDaoImpl implements FilmDao {
     }
 
     @Override
+    public void deleteAllFilms() {
+        String sqlQuery = "DELETE FROM films";
+        jdbcTemplate.update(sqlQuery);
+    }
+
+    @Override
+    public Film deleteFilmById(int id) {
+        String sqlQuery = "DELETE FROM films WHERE id = ?";
+        Film film = getFilmById(id);
+        jdbcTemplate.update(sqlQuery, id);
+        return film;
+    }
+
+    @Override
     public List<Film> getAllFilms() {
         String sqlQuery = "SELECT f.*,  rm.name AS mpa_name FROM films AS f " +
                 "LEFT JOIN rating_mpa AS rm ON f.rating_id = rm.id";

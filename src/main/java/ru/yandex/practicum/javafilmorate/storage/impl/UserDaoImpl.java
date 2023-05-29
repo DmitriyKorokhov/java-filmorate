@@ -37,6 +37,20 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public void deleteAllUsers() {
+        String sqlQuery = "DELETE FROM users";
+        jdbcTemplate.update(sqlQuery);
+    }
+
+    @Override
+    public User deleteUserById(int id) {
+        String sqlQuery = "DELETE FROM users WHERE id = ?";
+        User user = getUserById(id);
+        jdbcTemplate.update(sqlQuery, id);
+        return user;
+    }
+
+    @Override
     public User getUserById(int id) {
         String sqlQuery = "SELECT * FROM users WHERE id = ?";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);

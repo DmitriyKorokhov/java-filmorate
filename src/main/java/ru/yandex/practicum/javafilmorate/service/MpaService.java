@@ -14,22 +14,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MpaService {
 
-    private final MpaDao mpaStorage;
+    private final MpaDao mpaDao;
 
     public Mpa getMpaById(Integer id) {
         checkMpaExist(id);
-        log.info("Вывод Rating с id = %d", id);
-        return mpaStorage.getMpaById(id);
+        log.info("Вывод Rating с id = " + id);
+        return mpaDao.getMpaById(id);
     }
 
     public List<Mpa> getAllMpa() {
         log.info("Вывод всех Ratings");
-        return mpaStorage.getAllMpa();
+        return mpaDao.getAllMpa();
     }
 
     public void checkMpaExist(int id) {
-        if (!mpaStorage.isMpaExistedById(id)) {
-            throw new NotFoundException(String.format("Rating с id = %d не сужествует", id));
+        if (!mpaDao.isMpaExistedById(id)) {
+            throw new NotFoundException(String.format("Rating с id = " + id + " не сужествует"));
         }
     }
 }

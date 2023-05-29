@@ -59,6 +59,50 @@ class FilmorateApplicationTest {
     }
 
     @Test
+    void deleteUserByIdTest() {
+        userDao.addUser(User.builder()
+                .id(1)
+                .email("testUser@ya.ru")
+                .login("TestLogin")
+                .name("TestName")
+                .birthday(LocalDate.of(2000, 1, 1))
+                .build());
+        userDao.addUser(User.builder()
+                .id(2)
+                .email("othertetUser@ya.ru")
+                .login("otherTestLogin")
+                .name("otherTetName")
+                .birthday(LocalDate.of(2000, 1, 1))
+                .build());
+        userDao.deleteUserById(1);
+        List<User> users = userDao.getAllUsers();
+        assertThat(users).size()
+                .isEqualTo(1);
+    }
+
+    @Test
+    void deleteAllUserTest() {
+        userDao.addUser(User.builder()
+                .id(1)
+                .email("testUser@ya.ru")
+                .login("TestLogin")
+                .name("TestName")
+                .birthday(LocalDate.of(2000, 1, 1))
+                .build());
+        userDao.addUser(User.builder()
+                .id(2)
+                .email("othertetUser@ya.ru")
+                .login("otherTestLogin")
+                .name("otherTetName")
+                .birthday(LocalDate.of(2000, 1, 1))
+                .build());
+        userDao.deleteAllUsers();
+        List<User> users = userDao.getAllUsers();
+        assertThat(users).size()
+                .isEqualTo(0);
+    }
+
+    @Test
     void updateUserTest() {
         userDao.addUser(User.builder()
                 .id(1)
@@ -157,6 +201,64 @@ class FilmorateApplicationTest {
     }
 
     @Test
+    void deleteFilmByIdTest() {
+        filmDao.addFilm(Film.builder()
+                .id(1)
+                .name("The Batman")
+                .description("Batman will have to distinguish friend from foe " +
+                        "and restore justice in the name of Gotham.")
+                .releaseDate(LocalDate.of(2022, Month.MARCH, 1))
+                .duration(2)
+                .mpa(Mpa.builder().id(1).name("R").build())
+                .genres(new LinkedHashSet<>())
+                .build());
+        filmDao.addFilm(Film.builder()
+                .id(2)
+                .name("Spider-Man")
+                .description("Peter becomes a real superhero named Spider-Man, " +
+                        "who helps people and fights crime. But where there is a superhero, " +
+                        "sooner or later a supervillain always appears.")
+                .releaseDate(LocalDate.of(2002, Month.MARCH, 11))
+                .duration(2)
+                .mpa(Mpa.builder().id(1).name("R").build())
+                .genres(new LinkedHashSet<>())
+                .build());
+        filmDao.deleteFilmById(2);
+        List<Film> films = filmDao.getAllFilms();
+        assertThat(films).size()
+                .isEqualTo(1);
+    }
+
+    @Test
+    void deleteAllFilmsTest() {
+        filmDao.addFilm(Film.builder()
+                .id(1)
+                .name("The Batman")
+                .description("Batman will have to distinguish friend from foe " +
+                        "and restore justice in the name of Gotham.")
+                .releaseDate(LocalDate.of(2022, Month.MARCH, 1))
+                .duration(2)
+                .mpa(Mpa.builder().id(1).name("R").build())
+                .genres(new LinkedHashSet<>())
+                .build());
+        filmDao.addFilm(Film.builder()
+                .id(2)
+                .name("Spider-Man")
+                .description("Peter becomes a real superhero named Spider-Man, " +
+                        "who helps people and fights crime. But where there is a superhero, " +
+                        "sooner or later a supervillain always appears.")
+                .releaseDate(LocalDate.of(2002, Month.MARCH, 11))
+                .duration(2)
+                .mpa(Mpa.builder().id(1).name("R").build())
+                .genres(new LinkedHashSet<>())
+                .build());
+        filmDao.deleteAllFilms();
+        List<Film> films = filmDao.getAllFilms();
+        assertThat(films).size()
+                .isEqualTo(0);
+    }
+
+    @Test
     void updateFilmTest() {
         filmDao.addFilm(Film.builder()
                 .id(1)
@@ -237,12 +339,14 @@ class FilmorateApplicationTest {
         User user = userDao.getUserById(1);
         likesDao.addLike(film.getId(), user.getId());
         List<Film> topFilmsAfterLike = new ArrayList<>(filmDao.listOfFilmsByNumberOfLikes(1));
+        assertThat(topFilmsAfterLike).size()
+                .isEqualTo(1);
         assertThat(topFilmsAfterLike.get(0))
                 .hasFieldOrPropertyWithValue("name", "Spider-Man");
     }
 
     @Test
-    void testAddFriend() {
+    void addFriendTest() {
         userDao.addUser(User.builder()
                 .id(1)
                 .email("testUser@ya.ru")
@@ -268,7 +372,7 @@ class FilmorateApplicationTest {
     }
 
     @Test
-    void testRemoveFriend() {
+    void deleteFriendTest() {
         userDao.addUser(User.builder()
                 .id(1)
                 .email("testUser@ya.ru")
@@ -291,19 +395,19 @@ class FilmorateApplicationTest {
     }
 
     @Test
-    public void testGetGenres() {
+    public void getGenresTest() {
         assertEquals(genreDao.getAllGenres().size(), 6, "Неверное количество Genres");
     }
 
     @Test
-    public void testGetGenreById() {
+    public void getGenreByIdTest() {
         assertEquals(genreDao.getGenreById(1).getName(), "Комедия", "Неверный жанр");
         assertEquals(genreDao.getGenreById(3).getName(), "Мультфильм", "Неверный жанр");
         assertEquals(genreDao.getGenreById(6).getName(), "Боевик", "Неверный жанр");
     }
 
     @Test
-    void testGetMpas() {
+    void getAllMpasTest() {
         assertEquals(mpaDao.getAllMpa().size(), 5, "Неверное количество Mpa");
     }
 

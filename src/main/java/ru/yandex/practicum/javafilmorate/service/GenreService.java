@@ -23,13 +23,13 @@ public class GenreService {
 
     public Genre getGenreById(int id) {
         checkGenreExist(id);
-        log.info("Вывод Genre с id = %d", id);
+        log.info("Вывод Genre с id = " + id);
         return genreDao.getGenreById(id);
     }
 
     public void checkGenreExist(int id) {
         if (!genreDao.isGenreExistedById(id)) {
-            throw new NotFoundException(String.format("Genre с id = %d не сужествует", id));
+            throw new NotFoundException(String.format("Genre с id = " + id + " не сужествует"));
         }
     }
 }
