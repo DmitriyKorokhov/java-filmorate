@@ -295,7 +295,7 @@ class FilmorateApplicationTest {
                 .description("Batman will have to distinguish friend from foe " +
                         "and restore justice in the name of Gotham.")
                 .releaseDate(LocalDate.of(2022, Month.MARCH, 1))
-                .duration(2)
+                .duration(3)
                 .mpa(Mpa.builder().id(1).name("R").build())
                 .genres(new LinkedHashSet<>())
                 .build());
