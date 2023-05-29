@@ -1,11 +1,10 @@
 package ru.yandex.practicum.javafilmorate.storage.impl;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.javafilmorate.storage.FriendshipDao;
 import ru.yandex.practicum.javafilmorate.model.User;
+import ru.yandex.practicum.javafilmorate.storage.FriendshipDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +12,13 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class FriendshipDaoImpl implements FriendshipDao {
 
     private final JdbcTemplate jdbcTemplate;
+
+    public FriendshipDaoImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public void addFriend(int id, int friendId) {
@@ -39,11 +41,11 @@ public class FriendshipDaoImpl implements FriendshipDao {
         List<User> commonFriends = new ArrayList<>();
         while (rs.next()) {
             commonFriends.add(User.builder()
-                            .id(rs.getInt("id"))
-                            .name(rs.getString("login"))
-                            .login(rs.getString("name"))
-                            .email(rs.getString("email"))
-                            .birthday(Objects.requireNonNull(rs.getDate("birthday")).toLocalDate())
+                    .id(rs.getInt("id"))
+                    .name(rs.getString("login"))
+                    .login(rs.getString("name"))
+                    .email(rs.getString("email"))
+                    .birthday(Objects.requireNonNull(rs.getDate("birthday")).toLocalDate())
                     .build());
         }
         return commonFriends.stream().distinct().collect(Collectors.toList());

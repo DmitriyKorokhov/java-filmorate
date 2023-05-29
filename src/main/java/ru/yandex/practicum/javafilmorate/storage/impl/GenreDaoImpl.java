@@ -78,8 +78,8 @@ public class GenreDaoImpl implements GenreDao {
                 "WHERE fg.genre_id = g.id AND fg.film_id IN (" + inSql + ")";
         jdbcTemplate.query(sqlQuery, (rs) -> {
             if (!rs.wasNull()) {
-                final Film film = ids.get(rs.getInt("FILM_ID"));
-                film.addGenre(Genre.builder().id(rs.getInt("ID")).name(rs.getString("NAME")).build());
+                final Film film = ids.get(rs.getInt("film_id"));
+                film.addGenre(Genre.builder().id(rs.getInt("id")).name(rs.getString("name")).build());
             }
         }, films.stream().map(Film::getId).toArray());
         return new ArrayList<>(ids.values());
